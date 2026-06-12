@@ -76,17 +76,15 @@ body {
     margin-bottom: 40px;
 }
 
-.avatar-placeholder {
-    font-size: 48px;
-    background: white;
+.molly-avatar-small {
     width: 90px;
     height: 90px;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    object-fit: cover;
     margin: 0 auto 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    display: block;
+    border: 3px solid white;
 }
 
 .sidebar-header h2 {
@@ -403,4 +401,62 @@ textarea:focus {
 }
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(201, 24, 74, 0.5); 
+}
+
+/* Login Screen Styles */
+.login-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    background: inherit;
+    backdrop-filter: blur(10px);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    padding: 40px;
+}
+
+.login-card h2 {
+    font-family: 'Playpen Sans', cursive;
+    color: var(--color-primary-dark);
+    margin-bottom: 10px;
+    font-size: 28px;
+}
+
+.login-card p {
+    color: var(--color-text-muted);
+    margin-bottom: 30px;
+}
+
+.molly-avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    display: block;
+    border: 4px solid white;
+}
+
+.error-text {
+    color: #e63946 !important;
+    margin-top: 15px !important;
+    font-weight: 600;
+    margin-bottom: 0 !important;
+}
+
+.login-card .btn-primary {
+    width: 100%;
+    justify-content: center;
+    margin-top: 10px;
 }

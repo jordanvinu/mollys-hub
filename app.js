@@ -1,9 +1,14 @@
 // DOM Elements
 const navItems = document.querySelectorAll('.nav-links li');
 const views = document.querySelectorAll('.view-section');
-const apiKeyInput = document.getElementById('api-key');
-const openaiKeyInput = document.getElementById('openai-key');
-const saveKeyBtn = document.getElementById('save-key-btn');
+
+// Login Elements
+const loginScreen = document.getElementById('login-screen');
+const mainApp = document.getElementById('main-app');
+const usernameInput = document.getElementById('username');
+const passwordInput = document.getElementById('password');
+const loginBtn = document.getElementById('login-btn');
+const loginError = document.getElementById('login-error');
 
 // Idea Engine Elements
 const ideaTheme = document.getElementById('idea-theme');
@@ -19,27 +24,30 @@ const repliesResults = document.getElementById('replies-results');
 const repliesLoader = document.getElementById('replies-loader');
 const repliesContent = document.getElementById('replies-content');
 
-// Image Generator Elements
-const imagePrompt = document.getElementById('image-prompt');
-const generateImageBtn = document.getElementById('generate-image-btn');
-const imageResults = document.getElementById('image-results');
-const imageLoader = document.getElementById('image-loader');
-const imageContent = document.getElementById('image-content');
-
 // Copy Buttons
 const copyButtons = document.querySelectorAll('.btn-copy');
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
-    // Load saved API keys
-    const savedKey = localStorage.getItem('openrouter_key');
-    if (savedKey) {
-        apiKeyInput.value = savedKey;
-    }
-    const savedOpenAIKey = localStorage.getItem('openai_key');
-    if (savedOpenAIKey) {
-        openaiKeyInput.value = savedOpenAIKey;
-    }
+    
+    // Login Logic
+    loginBtn.addEventListener('click', () => {
+        const user = usernameInput.value.trim();
+        const pass = passwordInput.value;
+        if (user === 'mollymcsnuggles' && pass === 'Enton123!') {
+            loginScreen.classList.add('hidden');
+            mainApp.classList.remove('hidden');
+        } else {
+            loginError.classList.remove('hidden');
+        }
+    });
+
+    // Also allow 'Enter' key to login
+    passwordInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            loginBtn.click();
+        }
+    });
 
     // Navigation Logic
     navItems.forEach(item => {
@@ -60,25 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
-    });
-
-    // Save API Keys
-    saveKeyBtn.addEventListener('click', () => {
-        const key = apiKeyInput.value.trim();
-        const openaiKey = openaiKeyInput.value.trim();
-        localStorage.setItem('openrouter_key', key);
-        localStorage.setItem('openai_key', openaiKey);
-        
-        // Simple visual feedback
-        const originalText = saveKeyBtn.innerText;
-        saveKeyBtn.innerText = 'Saved!';
-        saveKeyBtn.style.background = '#ff8fa3';
-        saveKeyBtn.style.color = 'white';
-        setTimeout(() => {
-            saveKeyBtn.innerText = originalText;
-            saveKeyBtn.style.background = 'white';
-            saveKeyBtn.style.color = '#c9184a';
-        }, 2000);
     });
 
     // Copy Hashtags
@@ -122,17 +111,11 @@ Generate 3 specific post/reel ideas. For each idea, provide:
 Format the response in clean HTML with <h3>, <ul>, <li> tags. Do not wrap in markdown code blocks.`;
 
         try {
-            const response = await fetchOpenRouter(prompt);
-            ideasContent.innerHTML = response;
+            const response = await fetchQwen(prompt);
+            // Qwen might return markdown formatting, so let's strip out the raw ```html tags if it does
+            ideasContent.innerHTML = response.replace(/```html/g, '').replace(/```/g, '');
         } catch (error) {
-            ideasContent.innerHTML = `<p style="color: red;">Error: ${error.message}. <br><br>If you don't have an API key, here's a simulated response:</p>
-            <h3>1. The "I Can't Even" Reel</h3>
-            <ul>
-                <li><strong>Visual:</strong> Molly staring blankly at the camera while ignoring a command.</li>
-                <li><strong>Hook:</strong> "When your human says 'sit' but you're a Westie..."</li>
-                <li><strong>Caption:</strong> The Westitude is strong today. 🙄 Anybody else have a dog that selective-hears? #westitude</li>
-                <li><strong>Audio:</strong> Funny/sarcastic trending sound.</li>
-            </ul>`;
+            ideasContent.innerHTML = `<p style="color: red;">Error: ${error.message}. <br><br>Make sure the VPS is running!</p>`;
         }
 
         ideasLoader.classList.add('hidden');
@@ -158,108 +141,39 @@ Make them sound like they are coming from the owner talking about Molly, or play
 Format the response in clean HTML with an ordered list <ol> and <li> tags. Do not wrap in markdown code blocks.`;
 
         try {
-            const response = await fetchOpenRouter(prompt);
-            repliesContent.innerHTML = `<h3>Suggested Replies:</h3>${response}`;
+            const response = await fetchQwen(prompt);
+            repliesContent.innerHTML = `<h3>Suggested Replies:</h3>${response.replace(/```html/g, '').replace(/```/g, '')}`;
         } catch (error) {
-            repliesContent.innerHTML = `<p style="color: red;">Error: ${error.message}. <br><br>Simulated response:</p>
-            <h3>Suggested Replies:</h3>
-            <ol>
-                <li>Aww thank you! She knows she's cute and totally uses it to her advantage! 😂🐾</li>
-                <li>Molly says: *boop*! Thanks for the love! 🥰</li>
-                <li>She's a Westie, so the fluff is 90% attitude! 🤣 Thanks for commenting!</li>
-            </ol>`;
+            repliesContent.innerHTML = `<p style="color: red;">Error: ${error.message}. <br><br>Make sure the VPS is running!</p>`;
         }
 
         repliesLoader.classList.add('hidden');
         repliesContent.classList.remove('hidden');
         generateRepliesBtn.disabled = false;
     });
-
-    // Generate Image Logic
-    generateImageBtn.addEventListener('click', async () => {
-        const promptText = imagePrompt.value.trim();
-        if (!promptText) return alert("Please enter a description first! 🐾");
-
-        generateImageBtn.disabled = true;
-        imageResults.classList.remove('hidden');
-        imageLoader.classList.remove('hidden');
-        imageContent.innerHTML = '';
-        imageContent.classList.add('hidden');
-
-        try {
-            const imageUrl = await fetchOpenAIImage(promptText);
-            imageContent.innerHTML = `<img src="${imageUrl}" alt="Generated Image of Molly" style="max-width: 100%; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" />
-            <p style="margin-top:15px;"><a href="${imageUrl}" target="_blank" class="btn-secondary" style="text-decoration:none;">Open Full Size</a></p>`;
-        } catch (error) {
-            imageContent.innerHTML = `<p style="color: red;">Error: ${error.message}. <br><br>Make sure you saved a valid OpenAI API key!</p>`;
-        }
-
-        imageLoader.classList.add('hidden');
-        imageContent.classList.remove('hidden');
-        generateImageBtn.disabled = false;
-    });
 });
 
-// Helper function to call OpenRouter
-async function fetchOpenRouter(prompt) {
-    const apiKey = localStorage.getItem('openrouter_key');
-    if (!apiKey) {
-        throw new Error("No OpenRouter API key found. Please save it in the settings.");
-    }
+// Helper function to call Ollama on the VPS
+async function fetchQwen(prompt) {
+    // The VPS IP where Ollama is hosted
+    const vpsUrl = "http://37.27.90.154:11434/api/generate";
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch(vpsUrl, {
         method: "POST",
         headers: {
-            "Authorization": \`Bearer \${apiKey}\`,
-            "HTTP-Referer": "http://localhost:8080",
-            "X-Title": "Mollys Hub",
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            "model": "meta-llama/llama-3-8b-instruct:free",
-            "messages": [
-                {"role": "user", "content": prompt}
-            ]
+            "model": "qwen2.5:1.5b",
+            "prompt": prompt,
+            "stream": false
         })
     });
 
     if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || "Failed to fetch from OpenRouter");
+        throw new Error("Failed to connect to Molly's Brain on the VPS");
     }
 
     const data = await response.json();
-    return data.choices[0].message.content;
-}
-
-// Helper function to call OpenAI DALL-E
-async function fetchOpenAIImage(prompt) {
-    const apiKey = localStorage.getItem('openai_key');
-    if (!apiKey) {
-        throw new Error("No OpenAI API key found. Please save it in the settings.");
-    }
-
-    const fullPrompt = `A cute, slightly stubborn West Highland Terrier dog named Molly (white fluffy fur). ${prompt}. Beautiful lighting, high quality, instagram style photography.`;
-
-    const response = await fetch("https://api.openai.com/v1/images/generations", {
-        method: "POST",
-        headers: {
-            "Authorization": \`Bearer \${apiKey}\`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            "model": "dall-e-3",
-            "prompt": fullPrompt,
-            "n": 1,
-            "size": "1024x1024"
-        })
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || "Failed to fetch from OpenAI");
-    }
-
-    const data = await response.json();
-    return data.data[0].url;
+    return data.response;
 }
