@@ -50,6 +50,18 @@
                 <li data-view="hashtags-view">
                     <i class="fa-solid fa-hashtag"></i> Hashtag Vault
                 </li>
+                <li data-view="viral-view">
+                    <i class="fa-solid fa-chart-line"></i> Viral Analyzer
+                </li>
+                <li data-view="formatter-view">
+                    <i class="fa-solid fa-align-left"></i> Caption Formatter
+                </li>
+                <li data-view="calendar-view">
+                    <i class="fa-solid fa-calendar-days"></i> Content Calendar
+                </li>
+                <li data-view="trends-view">
+                    <i class="fa-solid fa-music"></i> Trending Audio
+                </li>
             </ul>
         </nav>
 
@@ -131,6 +143,122 @@
                         <p class="hashtag-list" id="tag-viral">#fyp #foryoupage #dogreels #trendingaudio #funnydogvideos #dogsoftiktok #cutepuppy #viralpets</p>
                         <button class="btn-copy" data-target="tag-viral"><i class="fa-solid fa-copy"></i> Copy</button>
                     </div>
+                </div>
+            </section>
+
+            <!-- 4. Viral Analyzer View -->
+            <section id="viral-view" class="view-section hidden">
+                <header class="view-header">
+                    <h1>Viral Recipe Analyzer 📈</h1>
+                    <p>Paste the topic or description of a Reel that performed well, and get 5 spin-off ideas.</p>
+                </header>
+
+                <div class="card glass">
+                    <div class="input-group">
+                        <label for="viral-concept">Describe your successful reel:</label>
+                        <textarea id="viral-concept" placeholder='e.g. "Molly ignored me when I said walk, but jumped up when I said treat. Got 200k views!"'></textarea>
+                    </div>
+                    <button id="analyze-viral-btn" class="btn-primary">
+                        <i class="fa-solid fa-microscope"></i> Analyze & Spin-off
+                    </button>
+                </div>
+
+                <div id="viral-results" class="results-container hidden">
+                    <div class="loader hidden" id="viral-loader">
+                        <i class="fa-solid fa-paw fa-bounce"></i> Analyzing...
+                    </div>
+                    <div id="viral-content" class="generated-content"></div>
+                </div>
+            </section>
+
+            <!-- 5. Caption Formatter View -->
+            <section id="formatter-view" class="view-section hidden">
+                <header class="view-header">
+                    <h1>Caption Formatter 📝</h1>
+                    <p>Write your caption here with blank lines. The formatter will add invisible characters so Instagram doesn't mess up your spacing!</p>
+                </header>
+
+                <div class="card glass">
+                    <div class="input-group">
+                        <label for="raw-caption">Your Draft Caption:</label>
+                        <textarea id="raw-caption" placeholder="Write your caption here..."></textarea>
+                    </div>
+                    <button id="format-caption-btn" class="btn-primary">
+                        <i class="fa-solid fa-magic"></i> Format & Copy
+                    </button>
+                </div>
+            </section>
+
+            <!-- 6. Content Calendar View -->
+            <section id="calendar-view" class="view-section hidden">
+                <header class="view-header">
+                    <h1>Content Calendar 📅</h1>
+                    <p>Plan out your week. Changes save automatically!</p>
+                </header>
+
+                <div class="calendar-grid">
+                    <div class="calendar-day card glass">
+                        <h3>Monday</h3>
+                        <textarea id="cal-mon" placeholder="Plan Monday..."></textarea>
+                    </div>
+                    <div class="calendar-day card glass">
+                        <h3>Tuesday</h3>
+                        <textarea id="cal-tue" placeholder="Plan Tuesday..."></textarea>
+                    </div>
+                    <div class="calendar-day card glass">
+                        <h3>Wednesday</h3>
+                        <textarea id="cal-wed" placeholder="Plan Wednesday..."></textarea>
+                    </div>
+                    <div class="calendar-day card glass">
+                        <h3>Thursday</h3>
+                        <textarea id="cal-thu" placeholder="Plan Thursday..."></textarea>
+                    </div>
+                    <div class="calendar-day card glass">
+                        <h3>Friday</h3>
+                        <textarea id="cal-fri" placeholder="Plan Friday..."></textarea>
+                    </div>
+                    <div class="calendar-day card glass">
+                        <h3>Saturday</h3>
+                        <textarea id="cal-sat" placeholder="Plan Saturday..."></textarea>
+                    </div>
+                    <div class="calendar-day card glass">
+                        <h3>Sunday</h3>
+                        <textarea id="cal-sun" placeholder="Plan Sunday..."></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. Trending Audio View -->
+            <section id="trends-view" class="view-section hidden">
+                <header class="view-header">
+                    <h1>Trending Audio Quick-Links 🎵</h1>
+                    <p>Find the best sounds for your Reels without scrolling for hours.</p>
+                </header>
+
+                <div class="trends-grid">
+                    <a href="https://www.instagram.com/creators/" target="_blank" class="card glass trend-card">
+                        <i class="fa-brands fa-instagram" style="font-size: 32px; color: #E1306C; margin-bottom: 15px;"></i>
+                        <h3>Instagram Creators</h3>
+                        <p>Weekly trend reports and audio tips directly from Instagram.</p>
+                    </a>
+                    
+                    <a href="https://ads.tiktok.com/business/creativecenter/inspiration/popular/music/pc/en" target="_blank" class="card glass trend-card">
+                        <i class="fa-brands fa-tiktok" style="font-size: 32px; color: #000000; margin-bottom: 15px;"></i>
+                        <h3>TikTok Creative Center</h3>
+                        <p>See exactly which songs are trending right now on TikTok.</p>
+                    </a>
+
+                    <a href="https://tokboard.com/" target="_blank" class="card glass trend-card">
+                        <i class="fa-solid fa-music" style="font-size: 32px; color: #69C9D0; margin-bottom: 15px;"></i>
+                        <h3>Tokboard</h3>
+                        <p>The top TikTok songs this week, ranked by popularity.</p>
+                    </a>
+                    
+                    <a href="https://open.spotify.com/search/trending%20on%20reels/playlists" target="_blank" class="card glass trend-card">
+                        <i class="fa-brands fa-spotify" style="font-size: 32px; color: #1DB954; margin-bottom: 15px;"></i>
+                        <h3>Spotify "Reels" Playlists</h3>
+                        <p>Search Spotify for curated playlists of trending IG Reels audio.</p>
+                    </a>
                 </div>
             </section>
 

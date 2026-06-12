@@ -24,6 +24,24 @@ const repliesResults = document.getElementById('replies-results');
 const repliesLoader = document.getElementById('replies-loader');
 const repliesContent = document.getElementById('replies-content');
 
+// Viral Analyzer Elements
+const viralConcept = document.getElementById('viral-concept');
+const analyzeViralBtn = document.getElementById('analyze-viral-btn');
+const viralResults = document.getElementById('viral-results');
+const viralLoader = document.getElementById('viral-loader');
+const viralContent = document.getElementById('viral-content');
+
+// Caption Formatter Elements
+const rawCaption = document.getElementById('raw-caption');
+const formatCaptionBtn = document.getElementById('format-caption-btn');
+
+// Calendar Elements
+const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const calInputs = {};
+days.forEach(day => {
+    calInputs[day] = document.getElementById(`cal-${day}`);
+});
+
 // Copy Buttons
 const copyButtons = document.querySelectorAll('.btn-copy');
 
@@ -150,6 +168,68 @@ Format the response in clean HTML with an ordered list <ol> and <li> tags. Do no
         repliesLoader.classList.add('hidden');
         repliesContent.classList.remove('hidden');
         generateRepliesBtn.disabled = false;
+    });
+
+    // Viral Analyzer Logic
+    analyzeViralBtn.addEventListener('click', async () => {
+        const concept = viralConcept.value.trim();
+        if (!concept) return alert("Please describe your viral reel first! 📈");
+
+        analyzeViralBtn.disabled = true;
+        viralResults.classList.remove('hidden');
+        viralLoader.classList.remove('hidden');
+        viralContent.innerHTML = '';
+        viralContent.classList.add('hidden');
+
+        const prompt = `You are a viral content strategist for a West Highland Terrier named Molly (@mollymcsnuggles). 
+The owner had a reel go viral with this concept: "${concept}".
+Analyze why this likely worked, and generate 5 specific "spin-off" reel ideas that follow the same successful formula but with a fresh twist.
+Format the response in clean HTML with <h3>, <ul>, and <li> tags. Do not wrap in markdown code blocks.`;
+
+        try {
+            const response = await fetchQwen(prompt);
+            viralContent.innerHTML = response.replace(/```html/g, '').replace(/```/g, '');
+        } catch (error) {
+            viralContent.innerHTML = `<p style="color: red;">Error: ${error.message}. <br><br>Make sure the VPS is running!</p>`;
+        }
+
+        viralLoader.classList.add('hidden');
+        viralContent.classList.remove('hidden');
+        analyzeViralBtn.disabled = false;
+    });
+
+    // Caption Formatter Logic
+    formatCaptionBtn.addEventListener('click', () => {
+        const text = rawCaption.value;
+        if (!text) return alert("Please write a caption first! 📝");
+        
+        // Replace empty lines with the Braille Pattern Blank (invisible character \u2800)
+        // Instagram respects this and won't collapse the lines.
+        const formattedText = text.replace(/(?:\r\n|\r|\n)(?:\s*(?:\r\n|\r|\n))+/g, '\n\u2800\n');
+        
+        navigator.clipboard.writeText(formattedText).then(() => {
+            const originalHTML = formatCaptionBtn.innerHTML;
+            formatCaptionBtn.innerHTML = '<i class="fa-solid fa-check"></i> Formatted & Copied!';
+            formatCaptionBtn.style.background = '#4CAF50';
+            setTimeout(() => {
+                formatCaptionBtn.innerHTML = originalHTML;
+                formatCaptionBtn.style.background = ''; // reset to default
+            }, 2000);
+        });
+    });
+
+    // Calendar Logic (Load & Save)
+    days.forEach(day => {
+        const input = calInputs[day];
+        if (!input) return;
+        // Load existing
+        const saved = localStorage.getItem(`molly_cal_${day}`);
+        if (saved) input.value = saved;
+
+        // Auto-save on type
+        input.addEventListener('input', () => {
+            localStorage.setItem(`molly_cal_${day}`, input.value);
+        });
     });
 });
 
