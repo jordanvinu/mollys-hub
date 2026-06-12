@@ -2,6 +2,7 @@
 const navItems = document.querySelectorAll('.nav-links li');
 const views = document.querySelectorAll('.view-section');
 const apiKeyInput = document.getElementById('api-key');
+const openaiKeyInput = document.getElementById('openai-key');
 const saveKeyBtn = document.getElementById('save-key-btn');
 
 // Idea Engine Elements
@@ -18,15 +19,26 @@ const repliesResults = document.getElementById('replies-results');
 const repliesLoader = document.getElementById('replies-loader');
 const repliesContent = document.getElementById('replies-content');
 
+// Image Generator Elements
+const imagePrompt = document.getElementById('image-prompt');
+const generateImageBtn = document.getElementById('generate-image-btn');
+const imageResults = document.getElementById('image-results');
+const imageLoader = document.getElementById('image-loader');
+const imageContent = document.getElementById('image-content');
+
 // Copy Buttons
 const copyButtons = document.querySelectorAll('.btn-copy');
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
-    // Load saved API key
+    // Load saved API keys
     const savedKey = localStorage.getItem('openrouter_key');
     if (savedKey) {
         apiKeyInput.value = savedKey;
+    }
+    const savedOpenAIKey = localStorage.getItem('openai_key');
+    if (savedOpenAIKey) {
+        openaiKeyInput.value = savedOpenAIKey;
     }
 
     // Navigation Logic
@@ -50,10 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Save API Key
+    // Save API Keys
     saveKeyBtn.addEventListener('click', () => {
         const key = apiKeyInput.value.trim();
+        const openaiKey = openaiKeyInput.value.trim();
         localStorage.setItem('openrouter_key', key);
+        localStorage.setItem('openai_key', openaiKey);
         
         // Simple visual feedback
         const originalText = saveKeyBtn.innerText;
@@ -97,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ideasContent.classList.add('hidden');
 
         const prompt = `You are a creative Instagram manager for a cute, slightly stubborn West Highland Terrier named Molly (@mollymcsnuggles). 
+Background info: Molly lives in Malta 🇲🇹. Her vibe is "One part marshmallow, two parts menace 🐾", known for "daily Westie chaos".
 The owner needs content ideas based on this theme: "${theme}".
 Generate 3 specific post/reel ideas. For each idea, provide:
 1. Concept/Visual (What happens in the video/photo)
@@ -137,6 +152,7 @@ Format the response in clean HTML with <h3>, <ul>, <li> tags. Do not wrap in mar
         repliesContent.classList.add('hidden');
 
         const prompt = `You are Molly the West Highland Terrier's persona (@mollymcsnuggles). A follower just commented: "${comment}". 
+Molly's Background: She lives in Malta 🇲🇹, her vibe is "One part marshmallow, two parts menace", and she brings "daily Westie chaos".
 Generate 3 different fun, engaging, and cute replies that the owner can copy-paste back to the follower. 
 Make them sound like they are coming from the owner talking about Molly, or playfully from Molly herself.
 Format the response in clean HTML with an ordered list <ol> and <li> tags. Do not wrap in markdown code blocks.`;
@@ -157,6 +173,30 @@ Format the response in clean HTML with an ordered list <ol> and <li> tags. Do no
         repliesLoader.classList.add('hidden');
         repliesContent.classList.remove('hidden');
         generateRepliesBtn.disabled = false;
+    });
+
+    // Generate Image Logic
+    generateImageBtn.addEventListener('click', async () => {
+        const promptText = imagePrompt.value.trim();
+        if (!promptText) return alert("Please enter a description first! 🐾");
+
+        generateImageBtn.disabled = true;
+        imageResults.classList.remove('hidden');
+        imageLoader.classList.remove('hidden');
+        imageContent.innerHTML = '';
+        imageContent.classList.add('hidden');
+
+        try {
+            const imageUrl = await fetchOpenAIImage(promptText);
+            imageContent.innerHTML = `<img src="${imageUrl}" alt="Generated Image of Molly" style="max-width: 100%; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" />
+            <p style="margin-top:15px;"><a href="${imageUrl}" target="_blank" class="btn-secondary" style="text-decoration:none;">Open Full Size</a></p>`;
+        } catch (error) {
+            imageContent.innerHTML = `<p style="color: red;">Error: ${error.message}. <br><br>Make sure you saved a valid OpenAI API key!</p>`;
+        }
+
+        imageLoader.classList.add('hidden');
+        imageContent.classList.remove('hidden');
+        generateImageBtn.disabled = false;
     });
 });
 
@@ -190,4 +230,36 @@ async function fetchOpenRouter(prompt) {
 
     const data = await response.json();
     return data.choices[0].message.content;
+}
+
+// Helper function to call OpenAI DALL-E
+async function fetchOpenAIImage(prompt) {
+    const apiKey = localStorage.getItem('openai_key');
+    if (!apiKey) {
+        throw new Error("No OpenAI API key found. Please save it in the settings.");
+    }
+
+    const fullPrompt = `A cute, slightly stubborn West Highland Terrier dog named Molly (white fluffy fur). ${prompt}. Beautiful lighting, high quality, instagram style photography.`;
+
+    const response = await fetch("https://api.openai.com/v1/images/generations", {
+        method: "POST",
+        headers: {
+            "Authorization": \`Bearer \${apiKey}\`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "model": "dall-e-3",
+            "prompt": fullPrompt,
+            "n": 1,
+            "size": "1024x1024"
+        })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || "Failed to fetch from OpenAI");
+    }
+
+    const data = await response.json();
+    return data.data[0].url;
 }

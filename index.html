@@ -33,12 +33,19 @@
                 <li data-view="hashtags-view">
                     <i class="fa-solid fa-hashtag"></i> Hashtag Vault
                 </li>
+                <li data-view="image-view">
+                    <i class="fa-solid fa-image"></i> Image Generator
+                </li>
             </ul>
 
             <div class="settings-panel">
                 <label for="api-key"><i class="fa-solid fa-key"></i> OpenRouter Key:</label>
                 <input type="password" id="api-key" placeholder="sk-or-v1-..." />
-                <button id="save-key-btn" class="btn-secondary">Save Key</button>
+                
+                <label for="openai-key" style="margin-top:10px;"><i class="fa-solid fa-image"></i> OpenAI Key:</label>
+                <input type="password" id="openai-key" placeholder="sk-proj-..." />
+
+                <button id="save-key-btn" class="btn-secondary">Save Keys</button>
             </div>
         </nav>
 
@@ -120,6 +127,31 @@
                         <p class="hashtag-list" id="tag-viral">#fyp #foryoupage #dogreels #trendingaudio #funnydogvideos #dogsoftiktok #cutepuppy #viralpets</p>
                         <button class="btn-copy" data-target="tag-viral"><i class="fa-solid fa-copy"></i> Copy</button>
                     </div>
+                </div>
+            </section>
+
+            <!-- 4. Image Generator View -->
+            <section id="image-view" class="view-section hidden">
+                <header class="view-header">
+                    <h1>Image Generator 🎨</h1>
+                    <p>Describe a fun scene for Molly and let AI paint it! (Requires OpenAI Key)</p>
+                </header>
+
+                <div class="card glass">
+                    <div class="input-group">
+                        <label for="image-prompt">What should the image look like?</label>
+                        <textarea id="image-prompt" placeholder='e.g. "A cute fluffy West Highland Terrier wearing pink sunglasses, sitting on a beach in Malta during sunset"'></textarea>
+                    </div>
+                    <button id="generate-image-btn" class="btn-primary">
+                        <i class="fa-solid fa-paintbrush"></i> Generate Image
+                    </button>
+                </div>
+
+                <div id="image-results" class="results-container hidden">
+                    <div class="loader hidden" id="image-loader">
+                        <i class="fa-solid fa-paw fa-bounce"></i> Painting...
+                    </div>
+                    <div id="image-content" class="generated-content" style="text-align: center;"></div>
                 </div>
             </section>
 
