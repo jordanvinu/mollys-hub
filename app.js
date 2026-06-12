@@ -42,6 +42,10 @@ days.forEach(day => {
     calInputs[day] = document.getElementById(`cal-${day}`);
 });
 
+// Settings Elements
+const mollyBrain = document.getElementById('molly-brain');
+const saveSettingsBtn = document.getElementById('save-settings-btn');
+
 // Copy Buttons
 const copyButtons = document.querySelectorAll('.btn-copy');
 
@@ -117,8 +121,9 @@ document.addEventListener('DOMContentLoaded', () => {
         ideasContent.innerHTML = '';
         ideasContent.classList.add('hidden');
 
+        const brainContext = getMollyBrainContext();
         const prompt = `You are a creative Instagram manager for a cute, slightly stubborn West Highland Terrier named Molly (@mollymcsnuggles). 
-Background info: Molly lives in Malta 🇲🇹. Her vibe is "One part marshmallow, two parts menace 🐾", known for "daily Westie chaos".
+${brainContext}
 The owner needs content ideas based on this theme: "${theme}".
 Generate 3 specific post/reel ideas. For each idea, provide:
 1. Concept/Visual (What happens in the video/photo)
@@ -152,8 +157,9 @@ Format the response in clean HTML with <h3>, <ul>, <li> tags. Do not wrap in mar
         repliesContent.innerHTML = '';
         repliesContent.classList.add('hidden');
 
+        const brainContext = getMollyBrainContext();
         const prompt = `You are Molly the West Highland Terrier's persona (@mollymcsnuggles). A follower just commented: "${comment}". 
-Molly's Background: She lives in Malta 🇲🇹, her vibe is "One part marshmallow, two parts menace", and she brings "daily Westie chaos".
+${brainContext}
 Generate 3 different fun, engaging, and cute replies that the owner can copy-paste back to the follower. 
 Make them sound like they are coming from the owner talking about Molly, or playfully from Molly herself.
 Format the response in clean HTML with an ordered list <ol> and <li> tags. Do not wrap in markdown code blocks.`;
@@ -181,7 +187,9 @@ Format the response in clean HTML with an ordered list <ol> and <li> tags. Do no
         viralContent.innerHTML = '';
         viralContent.classList.add('hidden');
 
+        const brainContext = getMollyBrainContext();
         const prompt = `You are a viral content strategist for a West Highland Terrier named Molly (@mollymcsnuggles). 
+${brainContext}
 The owner had a reel go viral with this concept: "${concept}".
 Analyze why this likely worked, and generate 5 specific "spin-off" reel ideas that follow the same successful formula but with a fresh twist.
 Format the response in clean HTML with <h3>, <ul>, and <li> tags. Do not wrap in markdown code blocks.`;
@@ -231,7 +239,33 @@ Format the response in clean HTML with <h3>, <ul>, and <li> tags. Do not wrap in
             localStorage.setItem(`molly_cal_${day}`, input.value);
         });
     });
+
+    // Molly Brain Logic (Load & Save)
+    const savedBrain = localStorage.getItem('molly_brain');
+    if (savedBrain) {
+        mollyBrain.value = savedBrain;
+    }
+
+    saveSettingsBtn.addEventListener('click', () => {
+        localStorage.setItem('molly_brain', mollyBrain.value);
+        const originalHTML = saveSettingsBtn.innerHTML;
+        saveSettingsBtn.innerHTML = '<i class="fa-solid fa-check"></i> Saved!';
+        saveSettingsBtn.style.background = '#4CAF50';
+        setTimeout(() => {
+            saveSettingsBtn.innerHTML = originalHTML;
+            saveSettingsBtn.style.background = ''; // reset
+        }, 2000);
+    });
 });
+
+// Helper function to inject Molly Brain
+function getMollyBrainContext() {
+    const saved = localStorage.getItem('molly_brain');
+    if (saved && saved.trim() !== '') {
+        return `Background info: ${saved.trim()}`;
+    }
+    return `Background info: Molly lives in Malta 🇲🇹. Her vibe is "One part marshmallow, two parts menace 🐾", known for "daily Westie chaos".`;
+}
 
 // Helper function to call Ollama on the VPS
 async function fetchQwen(prompt) {
